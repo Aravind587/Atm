@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="web-icon.png">
+</head>
+<body>
+    <div class="atm-container">
+        <h1 class="atm-title">ATM CENTER</h1>
+        <div class="screen-container">
+            <div class="function-buttons left">
+                <button class="func-btn" id="left-btn-1"><span class="btn-text">Deposit</span></button>
+                <button class="func-btn" id="left-btn-2"><span class="btn-text">Transfer</span></button>
+                <button class="func-btn" id="left-btn-3"><span class="btn-text">PIN Change</span></button>
+                <button class="func-btn" id="left-btn-4"><span class="btn-text">Others</span></button>
+            </div>
+            <div class="screen" id="screen">
+                <div id="welcome-screen">
+                    <h2>Welcome to the ATM</h2>
+                    <label for="card-number">Enter Card Number:</label>
+                    <input type="text" id="card-number" maxlength="16" placeholder="1234567890123456">
+                    <button class="screen-btn" onclick="submitCardNumber()">Submit</button>
+                </div>
+                <div id="pin-screen" class="hidden">
+                    <h2>Enter PIN</h2>
+                    <input type="password" id="pin" maxlength="4" placeholder="****">
+                    <button class="screen-btn" onclick="submitPin()">Enter</button>
+                </div>
+                <div id="main-menu" class="hidden">
+                    <h2>Select Your Transaction</h2>
+                    <p>Use the buttons on the sides to select a transaction.</p>
+                </div>
+                <div id="balance-screen" class="hidden">
+                    <h2>Your Balance</h2>
+                    <p id="balance-display"></p>
+                    <button class="screen-btn" onclick="backToMenu()">Back</button>
+                </div>
+                <div id="withdraw-screen" class="hidden">
+                    <h2>Cash Withdrawal</h2>
+                    <div class="currency-selection">
+                        <h3>Select Currency:</h3>
+                        <div class="preset-amounts">
+                            <button class="currency-btn" onclick="selectCurrency('USD')">USD</button>
+                            <button class="currency-btn" onclick="selectCurrency('EUR')">EUR</button>
+                            <button class="currency-btn" onclick="selectCurrency('GBP')">GBP</button>
+                            <button class="currency-btn" onclick="selectCurrency('JPY')">JPY</button>
+                            <button class="currency-btn" onclick="selectCurrency('INR')">INR</button>
+                        </div>
+                        <p id="currency-rate-display">Selected Currency: USD (1 USD = 1 USD)</p>
+                    </div>
+                    <div class="preset-amounts">
+                        <button class="preset-btn" onclick="setWithdrawAmount(50)">50</button>
+                        <button class="preset-btn" onclick="setWithdrawAmount(100)">100</button>
+                        <button class="preset-btn" onclick="setWithdrawAmount(150)">150</button>
+                    </div>
+                    <input type="number" id="withdraw-amount" placeholder="Enter amount in selected currency">
+                    <button class="screen-btn" onclick="processWithdraw()">Withdraw</button>
+                    <button class="screen-btn" onclick="backToMenu()">Back</button>
+                </div>
+                <div id="fast-cash-screen" class="hidden">
+                    <h2>Fast Cash</h2>
+                    <div class="preset-amounts">
+                        <button class="preset-btn" onclick="processFastCash(20)">$20</button>
+                        <button class="preset-btn" onclick="processFastCash(50)">$50</button>
+                        <button class="preset-btn" onclick="processFastCash(100)">$100</button>
+                    </div>
+                    <button class="screen-btn" onclick="backToMenu()">Back</button>
+                </div>
+                <div id="deposit-screen" class="hidden">
+                    <h2>Deposit Cash</h2>
+                    <input type="number" id="deposit-amount" placeholder="Enter amount">
+                    <button class="screen-btn" onclick="processDeposit()">Deposit</button>
+                    <button class="screen-btn" onclick="backToMenu()">Back</button>
+                </div>
+                <div id="transfer-screen" class="hidden">
+                    <h2>Transfer Money</h2>
+                    <input type="text" id="transfer-account" placeholder="Enter recipient account number">
+                    <input type="number" id="transfer-amount" placeholder="Enter amount">
+                    <button class="screen-btn" onclick="processTransfer()">Transfer</button>
+                    <button class="screen-btn" onclick="backToMenu()">Back</button>
+                </div>
+                <div id="pin-change-screen" class="hidden">
+                    <h2>Change PIN</h2>
+                    <input type="password" id="old-pin" maxlength="4" placeholder="Enter old PIN">
+                    <input type="password" id="new-pin" maxlength="4" placeholder="Enter new PIN">
+                    <button class="screen-btn" onclick="processPinChange()">Change PIN</button>
+                    <button class="screen-btn" onclick="backToMenu()">Back</button>
+                </div>
+                <div id="mini-statement-screen" class="hidden">
+                    <h2>Mini Statement</h2>
+                    <div id="mini-statement-display"></div>
+                    <button class="screen-btn" onclick="backToMenu()">Back</button>
+                </div>
+                <div id="others-screen" class="hidden">
+                    <h2>Other Services</h2>
+                    <div class="preset-amounts others-options">
+                        <button class="preset-btn" onclick="showBillPayment()">Bill Payment</button>
+                        <button class="preset-btn" onclick="showMobileRecharge()">Mobile Recharge</button>
+                        <button class="preset-btn" onclick="showChequeBookRequest()">Request Cheque Book</button>
+                        <button class="preset-btn" onclick="showCardlessWithdrawal()">Cardless Withdrawal</button>
+                        <button class="preset-btn" onclick="showExchangePhoneNumber()">Exchange Phone Number</button>
+                    </div>
+                    <button class="screen-btn" onclick="backToMenu()">Back</button>
+                </div>
+                <div id="bill-payment-screen" class="hidden">
+                    <h2>Bill Payment</h2>
+                    <input type="text" id="bill-id" placeholder="Enter Bill ID">
+                    <input type="number" id="bill-amount" placeholder="Enter amount">
+                    <button class="screen-btn" onclick="processBillPayment()">Pay Bill</button>
+                    <button class="screen-btn" onclick="showOthers()">Back</button>
+                </div>
+                <div id="mobile-recharge-screen" class="hidden">
+                    <h2>Mobile Recharge</h2>
+                    <input type="text" id="mobile-number" maxlength="10" placeholder="Enter mobile number">
+                    <input type="number" id="recharge-amount" placeholder="Enter amount">
+                    <button class="screen-btn" onclick="processMobileRecharge()">Recharge</button>
+                    <button class="screen-btn" onclick="showOthers()">Back</button>
+                </div>
+                <div id="cheque-book-screen" class="hidden">
+                    <h2>Request Cheque Book</h2>
+                    <p>Request a new cheque book (25 leaves) to be mailed to your address.</p>
+                    <button class="screen-btn" onclick="processChequeBookRequest()">Confirm Request</button>
+                    <button class="screen-btn" onclick="showOthers()">Back</button>
+                </div>
+                <div id="cardless-withdrawal-screen" class="hidden">
+                    <h2>Cardless Withdrawal</h2>
+                    <input type="text" id="cardless-code" placeholder="Enter withdrawal code">
+                    <input type="number" id="cardless-amount" placeholder="Enter amount">
+                    <button class="screen-btn" onclick="processCardlessWithdrawal()">Withdraw</button>
+                    <button class="screen-btn" onclick="showOthers()">Back</button>
+                </div>
+                <div id="exchange-phone-screen" class="hidden">
+                    <h2>Exchange Phone Number</h2>
+                    <input type="text" id="current-phone" maxlength="10" placeholder="Current phone number">
+                    <input type="text" id="new-phone" maxlength="10" placeholder="New phone number">
+                    <button class="screen-btn" onclick="processExchangePhoneNumber()">Change Number</button>
+                    <button class="screen-btn" onclick="showOthers()">Back</button>
+                </div>
+            </div>
+            <div class="function-buttons right">
+                <button class="func-btn" id="right-btn-1"><span class="btn-text">Fast Cash</span></button>
+                <button class="func-btn" id="right-btn-2"><span class="btn-text">Cash Withdrawal</span></button>
+                <button class="func-btn" id="right-btn-3"><span class="btn-text">Balance Enquiry</span></button>
+                <button class="func-btn" id="right-btn-4"><span class="btn-text">Mini Statement</span></button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
