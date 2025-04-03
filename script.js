@@ -7,13 +7,21 @@ const account = {
     phoneNumber: "1234567890" // Mock phone number
 };
 
-// Mock exchange rates (as of April 2025, approximate values)
+// Mock exchange rates and tax rates (as of April 2025, approximate values)
 const exchangeRates = {
     USD: 1.0,    // Base currency
     EUR: 0.95,   // 1 USD = 0.95 EUR
     GBP: 0.80,   // 1 USD = 0.80 GBP
     JPY: 150.0,  // 1 USD = 150 JPY
     INR: 84.0    // 1 USD = 84 INR
+};
+
+const taxRates = {
+    USD: 0.02,   // 2% tax in USA
+    EUR: 0.21,   // 21% VAT in Eurozone (e.g., Germany)
+    GBP: 0.20,   // 20% VAT in UK
+    JPY: 0.10,   // 10% consumption tax in Japan
+    INR: 0.18    // 18% GST in India
 };
 
 let currentInputField = null;
@@ -202,15 +210,27 @@ function processWithdraw() {
 
     // Interpret the amount in the selected currency and convert to USD
     const amountInUSD = amount / exchangeRates[selectedCurrency];
-    if (amountInUSD > account.balance) {
-        alert('Insufficient funds!');
+    const taxRate = taxRates[selectedCurrency];
+    const taxInSelectedCurrency = amount * taxRate;
+    const taxInUSD = taxInSelectedCurrency / exchangeRates[selectedCurrency];
+    const totalInUSD = amountInUSD + taxInUSD;
+
+    if (totalInUSD > account.balance) {
+        alert('Insufficient funds including tax!');
         return;
     }
 
-    // Deduct from balance in USD
-    account.balance -= amountInUSD;
-    account.transactions.push(`Withdrew ${amount.toFixed(2)} ${selectedCurrency} (${amountInUSD.toFixed(2)} USD) on ${new Date().toLocaleString()}`);
-    alert(`Successfully withdrew:\n${amountInUSD.toFixed(2)} USD\n${amount.toFixed(2)} ${selectedCurrency}`);
+    // Deduct the total amount (with tax) from balance in USD
+    account.balance -= totalInUSD;
+
+    // Log the transaction with withdrawal amount, tax, and total
+    account.transactions.push(`Withdrew ${amount.toFixed(2)} ${selectedCurrency} (Tax: ${taxInSelectedCurrency.toFixed(2)} ${selectedCurrency}, Total: ${totalInUSD.toFixed(2)} USD) on ${new Date().toLocaleString()}`);
+
+    // Show success message with withdrawal amount, tax, and total
+    alert(`Successfully withdrew:\n${totalInUSD.toFixed(2)} USD (Total)\n${amount.toFixed(2)} ${selectedCurrency} (Withdrawal)\n+ ${taxInSelectedCurrency.toFixed(2)} ${selectedCurrency} (Tax)`);
+
+    // Update balance display
+    showBalance();
     backToMenu();
 }
 
@@ -221,6 +241,7 @@ function processFastCash(amount) {
         account.balance -= amount;
         account.transactions.push(`Fast Cash: Withdrew $${amount.toFixed(2)} on ${new Date().toLocaleString()}`);
         alert(`Successfully withdrew $${amount.toFixed(2)}`);
+        showBalance(); // Update balance
         backToMenu();
     }
 }
@@ -233,6 +254,7 @@ function processDeposit() {
         account.balance += amount;
         account.transactions.push(`Deposited $${amount.toFixed(2)} on ${new Date().toLocaleString()}`);
         alert(`Successfully deposited $${amount.toFixed(2)}`);
+        showBalance(); // Update balance
         backToMenu();
     }
 }
@@ -250,6 +272,7 @@ function processTransfer() {
         account.balance -= amount;
         account.transactions.push(`Transferred $${amount.toFixed(2)} to ${accountNumber} on ${new Date().toLocaleString()}`);
         alert(`Successfully transferred $${amount.toFixed(2)} to account ${accountNumber}`);
+        showBalance(); // Update balance
         backToMenu();
     }
 }
@@ -295,6 +318,7 @@ function processBillPayment() {
         account.balance -= amount;
         account.transactions.push(`Bill Payment of $${amount.toFixed(2)} for Bill ID ${billId} on ${new Date().toLocaleString()}`);
         alert(`Successfully paid $${amount.toFixed(2)} for bill ID ${billId}`);
+        showBalance(); // Update balance
         showOthers();
     }
 }
@@ -319,6 +343,7 @@ function processMobileRecharge() {
         account.balance -= amount;
         account.transactions.push(`Mobile Recharge of $${amount.toFixed(2)} for ${mobileNumber} on ${new Date().toLocaleString()}`);
         alert(`Successfully recharged $${amount.toFixed(2)} for mobile number ${mobileNumber}`);
+        showBalance(); // Update balance
         showOthers();
     }
 }
@@ -355,6 +380,7 @@ function processCardlessWithdrawal() {
         account.balance -= amount;
         account.transactions.push(`Cardless Withdrawal of $${amount.toFixed(2)} on ${new Date().toLocaleString()}`);
         alert(`Successfully withdrew $${amount.toFixed(2)} using cardless withdrawal`);
+        showBalance(); // Update balance
         showOthers();
     }
 }
@@ -377,7 +403,7 @@ function processExchangePhoneNumber() {
         account.phoneNumber = newPhone;
         account.transactions.push(`Phone number changed to ${newPhone} on ${new Date().toLocaleString()}`);
         alert('Phone number successfully changed!');
-        showOthers();
+        backToMenu();
     }
 }
 
